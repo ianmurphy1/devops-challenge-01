@@ -1,0 +1,62 @@
+name: drift
+services:
+  app:
+    container_name: drift-app
+    image: drift-app
+    environment:
+      DB_HOST: mysql
+      DB_USER: app_user
+      DB_PASSWORD_FILE: /run/secrets/app_password
+      DB_DATABASE: driftapp
+      JWT_SECRET_FILE: /run/secrets/jwt_secretkey
+    ports:
+      - "3000:3000"
+    secrets:
+      - app_password
+      - jwt_secretkey
+    depends_on:
+      mysql:
+        condition: service_healthy
+    build:
+      context: ./src
+      dockerfile: ../app.Dockerfile
+
+  mysql:
+    container_name: drift-mysql
+    image: drift-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/root_pass
+      MYSQL_USER: drift_user
+      MYSQL_PASSWORD_FILE: /run/secrets/drift_user_pass
+      MYSQL_APP_PASSWORD_FILE: /run/secrets/app_password
+      MYSQL_DATABASE: driftapp
+    secrets:
+      - root_pass
+      - drift_user_pass
+      - app_password
+    volumes:
+      - mysql:/var/lib/mysql
+    healthcheck:
+      test: 'mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD'
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    build:
+      context: ./mysql
+      dockerfile: ../mysql.Dockerfile
+
+volumes:
+  mysql:
+    name: mysql
+
+secrets:
+  root_pass:
+    file: ./secrets/root_pass
+  drift_user_pass:
+    file: ./secrets/drift_user_pass
+  app_password:
+    file: ./secrets/app_password
+  jwt_secretkey:
+    file: ./secrets/jwt_secretkey
+
