@@ -49,6 +49,7 @@ The following is a list of changes or additions to the provided project where th
     * Request body validation by `express-validator`
 * JWT protected endpoints through authorisation header
 * `/drift` endpoint implemented
+    * For this endpoint the version in the `staging` account and `primary` region was taken as the latest version of an individual application
 * docker secrets for all values that need to be protected
     * While these secrets are included and pushed into github for this exercise these would be better off in a secret vault and retrieved at either deploy time (for mysql initialisation) or run time to prevent public exposure. Given the use of AWS services within Servisbot - Secrets Manager would be ideal for these secret values to be stored in.
 * MySQL container isolated from host network
