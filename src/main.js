@@ -185,8 +185,11 @@ const loginValidator = [
 ];
 app.post('/login', loginValidator, login(db));
 
-// Inject dependencies into routes
+// All endpoints from here use authorisation header
+// so add middleware once to avoid adding to each
+// endpoint individually
 app.use(auth);
+// Inject dependencies into routes
 app.post('/release', createReleaseRoute(db));
 app.get('/releases', listReleasesRoute(db));
 app.get('/drift', detectDriftRoute(db));
